@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximumscale=1,user-scalable=no" />
+    <title>نمونه دوره 1</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.7/esri/css/main.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/4.7/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <script src="https://js.arcgis.com/4.7/"></script>
+    <script>
+        require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/widgets/LayerList",
+            "esri/layers/FeatureLayer",
+            "esri/widgets/Home",
+            "esri/widgets/ScaleBar",
+            "dojo/domReady!"
+        ], function (
+            Map,
+            MapView,
+            LayerList,
+            FeatureLayer,
+            Home,
+            ScaleBar
+        ) {
+                var map = new Map({
+                    basemap: "osm"
+                });
+                var view = new MapView({
+                    container: "viewDiv",
+                    map: map,
+                    center: [51.351331, 35.781949],
+                    zoom: 8
+                });
+                var serviceURL = "http://chakadwebgis.ir/gis/rest/services/bm/Ostan_Tehran_Seismics_Zone/MapServer/";
+                var earthQuakes = new FeatureLayer({
+                    url: serviceURL+"0",
+                    outFields: ["*"],
+                    popupTemplate: {
+                        title: "Depth : {Depth_km} \n Mag : {Mag}",
+                        content: "{*}"
+                    }
+                });
+                
+                var seismicZone = new FeatureLayer({
+                    url: serviceURL+"1",
+                    outFields: ["*"]
+                });
+                map.add(seismicZone);
+                map.add(earthQuakes);
+                view.when(function () {
+                    var homeButton = new Home({
+                        view: view
+                    });
+                    view.ui.add(homeButton, "top-left");
+
+                    var scaleBar = new ScaleBar({
+                        view: view,
+                        unit: "dual"
+                    });
+                    view.ui.add(scaleBar, "bottom-left");
+
+                    
+                    var layerList = new LayerList({
+                        view: view, // Legend
+                        listItemCreatedFunction: function (event) {
+                            const item = event.item;
+                            item.panel = {
+                                content: "legend",
+                                open: false
+                            };
+                        }
+                        // Legend
+                    });
+                    view.ui.add(layerList, "top-right");
+                    
+                    
+                });
+            }
+        );
+    </script>
+
+
+</head>
+
+<body class="claro">
+    <div id="viewDiv"></div>
+</body>
+
+</html>
